@@ -265,6 +265,25 @@ The OpenStack backend accepts the following backend options:
    volume than the other backends. Also, S3QL requires Swift storage
    servers to provide immediate consistency for newly created objects.
 
++Hubic
++=====
++
++The hubic backend is an extension of the swift backend to support
++hubic's ... unique authentication method.
++You need to go to https://hubic.com/home/browser/account/, click 
++'Developers' and add an application with ``http://localhost/``
++as the redirection URL and any name (which must be globally unique in 
++hubic's system). Then click 'Details', take a note of you client ID
++and secret and run:
++
++   s3ql_oauth_client --hubic --clientid <id> --clientsecret <secret>
++   
++You will be prompted for your username and password, the issued with a
++redirection token. You can now use <id>:<secret> as your login and the
++redirection token as your password in the S3QL authentication file.
++
++
+
 
 Rackspace CloudFiles
 ====================
