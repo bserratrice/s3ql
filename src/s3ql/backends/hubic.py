@@ -77,7 +77,10 @@ class Backend(swift.Backend):
                                              self.client_secret),
                           allow_redirects=False)
 
+        log.debug('HTTP Status Code: ' + r.status_code)
+
         if r.status_code != 200:
+            log.debug('HTTP Response: ' + pprint.pformat(r))
             raise AuthorizationError(r.json()['error'])
 
         log.info('Requesting new openstack swift token')
