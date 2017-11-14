@@ -78,7 +78,7 @@ class Backend(swift.Backend):
                                              self.client_secret),
                           allow_redirects=False)
 
-        log.debug('HTTP Status Code: ' + str(r.status_code)
+        log.debug('HTTP Status Code: ' + str(r.status_code))
 
         if r.status_code != 200:
             log.debug('HTTP Response: ' + pprint.pformat(r))
@@ -92,6 +92,7 @@ class Backend(swift.Backend):
         r = requests.get(self.cred_url, headers=headers)
 
         if r.status_code != 200:
+            log.debug('HTTP Response: ' + pprint.pformat(r))
             raise AuthorizationError(r.json()['error'])
 
         Backend.os_token = r.json()
