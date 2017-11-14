@@ -9,6 +9,7 @@ import urllib.parse
 import sys
 import threading
 import requests
+import pprint
 from requests.auth import HTTPBasicAuth
 from datetime import datetime, timedelta
 
@@ -77,7 +78,7 @@ class Backend(swift.Backend):
                                              self.client_secret),
                           allow_redirects=False)
 
-        log.debug('HTTP Status Code: ' + r.status_code)
+        log.debug('HTTP Status Code: ' + str(r.status_code)
 
         if r.status_code != 200:
             log.debug('HTTP Response: ' + pprint.pformat(r))
