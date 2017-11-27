@@ -10,6 +10,8 @@ import sys
 import threading
 import requests
 import pprint
+import time
+import random
 from requests.auth import HTTPBasicAuth
 from datetime import datetime, timedelta
 
@@ -72,23 +74,33 @@ class Backend(swift.Backend):
                    'grant_type': 'refresh_token'}
 
         log.debug('Refresh access token')
+        #Loop for retry in case of transient error on the backend side.
+        while True:
+            r = requests.post(self.token_url, payload,
+                            auth=HTTPBasicAuth(self.client_id,
+                                                self.client_secret),
+                            allow_redirects=False)
 
-        r = requests.post(self.token_url, payload,
-                          auth=HTTPBasicAuth(self.client_id,
-                                             self.client_secret),
-                          allow_redirects=False)
+            log.debug('HTTP Status Code: ' + str(r.status_code))
 
-        log.debug('HTTP Status Code: ' + str(r.status_code))
+            if r.status_code == 509:
+                log.warning('Hubic API Rate-Limit reached, waiting and retry')
+                time.sleep(2)
+                continue
+            
+            if r.status_code != 200:
+                log.debug('HTTP Response: ' + pprint.pformat(r))
+                raise AuthorizationError(r.json()['error'])
 
-        if r.status_code != 200:
-            log.debug('HTTP Response: ' + pprint.pformat(r))
-            raise AuthorizationError(r.json()['error'])
-
+            else:
+                break
+            
         log.info('Requesting new openstack swift token')
 
         headers = {'Authorization': 'Bearer ' + r.json()['access_token']}
 
         # Retrieve storage url and token
+        time.sleep(random.randint(1,1000)/1000)
         r = requests.get(self.cred_url, headers=headers)
 
         if r.status_code != 200:
